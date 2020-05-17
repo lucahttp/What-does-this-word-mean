@@ -44,6 +44,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,22 +80,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        TextView mTextViewResult = (TextView) findViewById(R.id.text_view_result);
-        RequestQueue mQueue = Volley.newRequestQueue(this);
-
-        /*
-        View buttonParse = findViewById(R.id.btnSpeak);
-        RequestQueue mQueue = Volley.newRequestQueue(this);
-        buttonParse.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(),"Running function",Toast.LENGTH_SHORT).show();
-                getInfoFromApi3("moe");
-            }
-        });
-
-         */
-
     }
 
 
@@ -108,7 +97,8 @@ public class MainActivity extends AppCompatActivity {
     private void startVoiceInput() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        //intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Hello, How can I help you?");
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
@@ -191,7 +181,23 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
-                        textView.setText("Response is: "+ response.substring(0,500));
+
+                        //V1
+                        //textView.setText("Response is: "+ response.substring(0,500));
+
+                        //V2
+                        //textView.setText("Response is: "+ response);
+
+
+                        //V3
+                        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                        JsonParser jp = new JsonParser();
+                        JsonElement je = jp.parse(response);
+                        String prettyJsonString = gson.toJson(je);
+
+                        textView.setText("Response is: "+ prettyJsonString);
+
+
                     }
                 }, new Response.ErrorListener() {
             @Override
